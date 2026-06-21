@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Nani — Personal Portfolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+/* ─────────────────────────────────────────────
+   TOKENS
+───────────────────────────────────────────── */
+:root{
+  --bg:#050A18;
+  --surface:#0C1428;
+  --surface2:#101D38;
+  --border:#1A2E55;
+  --neon:#00F0FF;
+  --neon2:#7B5CFF;
+  --neon3:#FF3CAC;
+  --text:#E8EEF8;
+  --muted:#6C7FA8;
+  --white:#FFFFFF;
+  --glow-cyan: 0 0 20px rgba(0,240,255,.45), 0 0 60px rgba(0,240,255,.15);
+  --glow-purple: 0 0 20px rgba(123,92,255,.45), 0 0 60px rgba(123,92,255,.15);
+  --glow-pink: 0 0 20px rgba(255,60,172,.45);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:"Space Grotesk",system-ui,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  overflow-x:hidden;
+  line-height:1.65;
+}
+
+/* ─── SCROLLBAR ─── */
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--neon2);border-radius:3px}
+
+/* ─────────────────────────────────────────────
+   ANIMATED STARFIELD CANVAS (fixed background)
+───────────────────────────────────────────── */
+#stars{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none}
+
+/* ─────────────────────────────────────────────
+   GRID OVERLAY
+───────────────────────────────────────────── */
+.grid-overlay{
+  position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:
+    linear-gradient(rgba(0,240,255,.03) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,240,255,.03) 1px,transparent 1px);
+  background-size:60px 60px;
+}
+
+/* ─────────────────────────────────────────────
+   NAV
+───────────────────────────────────────────── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  padding:0 40px;
+  height:68px;
+  display:flex;align-items:center;justify-content:space-between;
+  background:rgba(5,10,24,.75);
+  backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--border);
+}
+.nav-logo{
+  font-family:"Syne",sans-serif;font-size:24px;font-weight:800;
+  background:linear-gradient(90deg,var(--neon),var(--neon2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  letter-spacing:-.5px;
+}
+.nav-links{display:flex;gap:32px;list-style:none}
+.nav-links a{
+  color:var(--muted);text-decoration:none;font-size:14px;font-weight:600;
+  letter-spacing:.06em;text-transform:uppercase;
+  transition:color .2s;position:relative;
+}
+.nav-links a::after{
+  content:"";position:absolute;bottom:-4px;left:0;width:0;height:2px;
+  background:var(--neon);border-radius:2px;transition:width .3s;
+}
+.nav-links a:hover{color:var(--neon)}
+.nav-links a:hover::after{width:100%}
+
+/* ─────────────────────────────────────────────
+   WRAP
+───────────────────────────────────────────── */
+.wrap{max-width:1000px;margin:0 auto;padding:0 32px;position:relative;z-index:2}
+
+/* ─────────────────────────────────────────────
+   HERO
+───────────────────────────────────────────── */
+.hero{
+  min-height:100vh;
+  display:flex;align-items:center;justify-content:center;
+  text-align:center;
+  padding:100px 32px 60px;
+  position:relative;
+}
+
+/* Glowing orbs behind hero */
+.orb{
+  position:absolute;border-radius:50%;filter:blur(80px);pointer-events:none;
+}
+.orb-1{width:400px;height:400px;background:rgba(0,240,255,.08);top:10%;left:-80px}
+.orb-2{width:500px;height:500px;background:rgba(123,92,255,.08);bottom:5%;right:-100px}
+.orb-3{width:300px;height:300px;background:rgba(255,60,172,.06);top:40%;left:40%}
+
+/* Avatar */
+.avatar-ring{
+  width:168px;height:168px;border-radius:50%;margin:0 auto 32px;
+  padding:3px;
+  background:linear-gradient(135deg,var(--neon),var(--neon2),var(--neon3));
+  box-shadow:var(--glow-cyan);
+  animation:spin-ring 8s linear infinite;
+}
+@keyframes spin-ring{to{filter:hue-rotate(360deg)}}
+.avatar-inner{
+  width:100%;height:100%;border-radius:50%;
+  background:var(--surface2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:600;color:var(--muted);text-align:center;
+  overflow:hidden;
+  /* ← REPLACE THIS: set background-image:url('your-photo.jpg') and remove the text */
+}
+
+.hero-eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(0,240,255,.07);border:1px solid rgba(0,240,255,.2);
+  border-radius:40px;padding:6px 18px;
+  font-size:13px;font-weight:600;color:var(--neon);letter-spacing:.08em;
+  margin-bottom:22px;
+  animation:fadeUp .6s ease both;
+}
+.hero-eyebrow .dot-live{
+  width:8px;height:8px;border-radius:50%;background:var(--neon);
+  box-shadow:0 0 8px var(--neon);
+  animation:pulse-dot 1.5s ease-in-out infinite;
+}
+@keyframes pulse-dot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.7)}}
+
+.hero h1{
+  font-family:"Syne",sans-serif;
+  font-size:clamp(44px,9vw,80px);font-weight:800;
+  line-height:1.0;
+  background:linear-gradient(135deg,#fff 30%,var(--neon) 70%,var(--neon2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  margin-bottom:16px;
+  animation:fadeUp .7s .1s ease both;
+}
+.hero-sub{
+  font-size:18px;color:var(--muted);max-width:540px;margin:0 auto 36px;
+  animation:fadeUp .7s .2s ease both;
+}
+.hero-sub strong{color:var(--neon2)}
+
+.hero-btns{
+  display:flex;gap:16px;justify-content:center;flex-wrap:wrap;
+  animation:fadeUp .7s .3s ease both;
+}
+
+/* ─── BUTTONS ─── */
+.btn{
+  display:inline-flex;align-items:center;gap:9px;
+  padding:14px 30px;border-radius:50px;
+  font-family:"Space Grotesk",sans-serif;font-size:15px;font-weight:700;
+  text-decoration:none;cursor:pointer;border:none;
+  transition:transform .2s, box-shadow .2s, filter .2s;
+  position:relative;overflow:hidden;
+}
+.btn::before{
+  content:"";position:absolute;inset:0;
+  background:rgba(255,255,255,.12);
+  transform:scaleX(0);transform-origin:left;
+  transition:transform .3s;
+}
+.btn:hover::before{transform:scaleX(1)}
+.btn:hover{transform:translateY(-3px)}
+
+.btn-primary{
+  background:linear-gradient(135deg,var(--neon),var(--neon2));
+  color:#050A18;
+  box-shadow:var(--glow-cyan);
+}
+.btn-primary:hover{box-shadow:0 0 32px rgba(0,240,255,.6),0 0 80px rgba(0,240,255,.2)}
+
+.btn-outline{
+  background:transparent;
+  border:1.5px solid var(--border);
+  color:var(--text);
+}
+.btn-outline:hover{border-color:var(--neon2);color:var(--neon2);box-shadow:var(--glow-purple)}
+
+.btn-ghost{
+  background:rgba(123,92,255,.12);
+  border:1.5px solid rgba(123,92,255,.3);
+  color:var(--neon2);
+}
+.btn-ghost:hover{background:rgba(123,92,255,.22);box-shadow:var(--glow-purple)}
+
+/* ─────────────────────────────────────────────
+   SECTION COMMONS
+───────────────────────────────────────────── */
+.section{padding:100px 0}
+.section-label{
+  font-size:12px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--neon);margin-bottom:12px;
+}
+.section-title{
+  font-family:"Syne",sans-serif;font-size:clamp(28px,5vw,46px);font-weight:800;
+  line-height:1.1;margin-bottom:20px;
+}
+.section-title span{
+  background:linear-gradient(90deg,var(--neon2),var(--neon3));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.divider{
+  width:60px;height:3px;
+  background:linear-gradient(90deg,var(--neon),var(--neon2));
+  border-radius:2px;margin-bottom:48px;
+  box-shadow:var(--glow-cyan);
+}
+
+/* ─── REVEAL ANIMATION ─── */
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .65s ease,transform .65s ease}
+.reveal.visible{opacity:1;transform:none}
+
+/* ─────────────────────────────────────────────
+   ABOUT
+───────────────────────────────────────────── */
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:start}
+.about-text{font-size:17px;color:var(--text);line-height:1.75}
+.about-text p{margin-bottom:18px}
+.about-text p:last-child{margin-bottom:0}
+
+.hobbies-title{font-weight:700;font-size:15px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:16px}
+.hobbies{display:flex;flex-direction:column;gap:14px}
+.hobby-card{
+  display:flex;align-items:center;gap:16px;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:16px;padding:16px 20px;
+  transition:border-color .25s,box-shadow .25s,transform .25s;
+  cursor:default;
+}
+.hobby-card:hover{
+  border-color:var(--neon);
+  box-shadow:var(--glow-cyan);
+  transform:translateX(6px);
+}
+.hobby-icon{
+  width:46px;height:46px;border-radius:12px;flex:none;
+  display:flex;align-items:center;justify-content:center;font-size:22px;
+}
+.hobby-icon.cyan{background:rgba(0,240,255,.1)}
+.hobby-icon.purple{background:rgba(123,92,255,.1)}
+.hobby-icon.pink{background:rgba(255,60,172,.1)}
+.hobby-icon.gold{background:rgba(255,200,60,.1)}
+.hobby-info strong{display:block;font-size:15px;font-weight:700}
+.hobby-info span{font-size:13px;color:var(--muted)}
+
+/* ─────────────────────────────────────────────
+   PHOTOS
+───────────────────────────────────────────── */
+.gallery-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  grid-template-rows:auto auto;
+  gap:14px;
+}
+.photo{
+  border-radius:18px;border:1px solid var(--border);
+  background:var(--surface);
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:600;color:var(--muted);text-align:center;
+  overflow:hidden;position:relative;
+  aspect-ratio:1/1;
+  transition:transform .3s, box-shadow .3s, border-color .3s;
+  background-size:cover;background-position:center;
+}
+.photo.big{grid-column:span 2;aspect-ratio:2/1}
+.photo:hover{transform:scale(1.03);border-color:var(--neon2);box-shadow:var(--glow-purple)}
+.photo-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(to top,rgba(5,10,24,.6),transparent);
+  opacity:0;transition:opacity .3s;
+  display:flex;align-items:flex-end;padding:16px;
+}
+.photo:hover .photo-overlay{opacity:1}
+.photo-label{color:#fff;font-size:13px;font-weight:600}
+/* To add photo: set background-image:url('yourphoto.jpg') in the element style */
+
+/* ─────────────────────────────────────────────
+   CONTACT
+───────────────────────────────────────────── */
+.contact-wrapper{
+  display:grid;grid-template-columns:1fr 1fr;gap:32px;
+}
+.contact-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:22px;padding:36px;
+  transition:border-color .25s, box-shadow .25s;
+}
+.contact-card:hover{border-color:var(--neon);box-shadow:var(--glow-cyan)}
+
+.contact-item{
+  display:flex;align-items:center;gap:16px;
+  text-decoration:none;color:var(--text);
+  padding:18px;border-radius:14px;
+  border:1px solid var(--border);
+  background:var(--surface2);
+  margin-bottom:14px;
+  transition:border-color .25s,box-shadow .25s,transform .2s;
+}
+.contact-item:last-child{margin-bottom:0}
+.contact-item:hover{border-color:var(--neon);box-shadow:var(--glow-cyan);transform:translateX(4px)}
+.c-icon{
+  width:48px;height:48px;flex:none;border-radius:14px;
+  display:flex;align-items:center;justify-content:center;font-size:22px;
+  background:rgba(0,240,255,.08);border:1px solid rgba(0,240,255,.15);
+}
+.c-info strong{display:block;font-size:15px;font-weight:700}
+.c-info span{font-size:13px;color:var(--muted)}
+
+/* Social buttons */
+.social-title{font-weight:700;font-size:15px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:18px}
+.socials{display:flex;flex-direction:column;gap:12px}
+.social-btn{
+  display:flex;align-items:center;gap:14px;
+  padding:16px 20px;border-radius:14px;
+  text-decoration:none;font-weight:700;font-size:15px;
+  border:1px solid var(--border);
+  transition:transform .2s, box-shadow .2s, border-color .2s;
+}
+.social-btn:hover{transform:translateX(6px)}
+.social-btn .s-icon{
+  width:40px;height:40px;border-radius:10px;flex:none;
+  display:flex;align-items:center;justify-content:center;font-size:20px;
+}
+.social-btn .s-arrow{margin-left:auto;font-size:18px;opacity:.5}
+
+.s-instagram{background:rgba(225,48,108,.08);border-color:rgba(225,48,108,.25);color:#E1306C}
+.s-instagram:hover{border-color:#E1306C;box-shadow:0 0 20px rgba(225,48,108,.3)}
+.s-instagram .s-icon{background:rgba(225,48,108,.12)}
+
+.s-facebook{background:rgba(66,103,178,.08);border-color:rgba(66,103,178,.25);color:#4267B2}
+.s-facebook:hover{border-color:#4267B2;box-shadow:0 0 20px rgba(66,103,178,.3)}
+.s-facebook .s-icon{background:rgba(66,103,178,.12)}
+
+.s-whatsapp{background:rgba(37,211,102,.08);border-color:rgba(37,211,102,.25);color:#25D366}
+.s-whatsapp:hover{border-color:#25D366;box-shadow:0 0 20px rgba(37,211,102,.3)}
+.s-whatsapp .s-icon{background:rgba(37,211,102,.12)}
+
+/* ─────────────────────────────────────────────
+   FOOTER
+───────────────────────────────────────────── */
+footer{
+  position:relative;z-index:2;
+  text-align:center;
+  padding:80px 32px 56px;
+  border-top:1px solid var(--border);
+  background:var(--surface);
+}
+.footer-glow{
+  position:absolute;top:-80px;left:50%;transform:translateX(-50%);
+  width:400px;height:200px;
+  background:radial-gradient(ellipse,rgba(123,92,255,.12),transparent 70%);
+  pointer-events:none;
+}
+footer h2{
+  font-family:"Syne",sans-serif;
+  font-size:clamp(30px,5vw,50px);font-weight:800;
+  background:linear-gradient(135deg,var(--white),var(--neon2),var(--neon3));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  margin-bottom:18px;
+}
+footer p{color:var(--muted);max-width:500px;margin:0 auto 32px;font-size:17px}
+.footer-heart{
+  font-size:28px;
+  animation:heartbeat 1.4s ease-in-out infinite;
+  display:inline-block;
+}
+@keyframes heartbeat{0%,100%{transform:scale(1)}14%{transform:scale(1.2)}28%{transform:scale(1)}}
+.footer-copy{margin-top:40px;font-size:13px;color:var(--border)}
+
+/* ─────────────────────────────────────────────
+   ANIMATIONS
+───────────────────────────────────────────── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+/* ─────────────────────────────────────────────
+   RESPONSIVE
+───────────────────────────────────────────── */
+@media(max-width:768px){
+  nav{padding:0 20px}
+  .nav-links{gap:18px}
+  .nav-links li:nth-child(3){display:none}
+  .about-grid{grid-template-columns:1fr}
+  .contact-wrapper{grid-template-columns:1fr}
+  .gallery-grid{grid-template-columns:1fr 1fr}
+  .photo.big{grid-column:span 2}
+}
+@media(max-width:480px){
+  .gallery-grid{grid-template-columns:1fr}
+  .photo.big{grid-column:span 1;aspect-ratio:1/1}
+}
+@media(prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+
+<!-- Stars canvas -->
+<canvas id="stars"></canvas>
+<div class="grid-overlay"></div>
+
+<!-- ═══ NAV ═══ -->
+<nav>
+  <div class="nav-logo">Nani.</div>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#photos">Gallery</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- ═══ HERO ═══ -->
+<section class="hero">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+  <div style="position:relative;z-index:2">
+    <div class="avatar-ring">
+      <div class="avatar-inner">Your<br>Photo</div>
+    </div>
+    <div class="hero-eyebrow">
+      <span class="dot-live"></span>
+      Available &amp; open to connect
+    </div>
+    <h1>Hey, I'm Nani</h1>
+    <p class="hero-sub">
+      A curious mind passionate about <strong>Volleyball</strong>, <strong>Artificial Intelligence</strong>, and <strong>Music</strong> — always searching for what's next.
+    </p>
+    <div class="hero-btns">
+      <a href="#about" class="btn btn-primary">
+        ✦ Explore my world
+      </a>
+      <a href="#contact" class="btn btn-outline">
+        Get in touch →
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ ABOUT ═══ -->
+<section class="section" id="about">
+  <div class="wrap">
+    <div class="reveal">
+      <p class="section-label">About me</p>
+      <h2 class="section-title">Who is <span>Nani?</span></h2>
+      <div class="divider"></div>
+    </div>
+    <div class="about-grid">
+      <div class="reveal about-text">
+        <p>
+          Hi there! I'm <strong>Nani</strong> — a curious, energetic person who loves to explore
+          the world both on and off the court. Whether I'm diving for a volleyball,
+          diving into an AI research paper, or discovering a new track that hits just right,
+          I'm always chasing that spark of something new.
+        </p>
+        <p>
+          I genuinely believe that learning never stops. Every day is a chance to level up —
+          whether that's understanding how a machine learning model works, improving my
+          serve, or stumbling upon a song that perfectly matches my mood.
+        </p>
+        <p>
+          I love meeting people, sharing ideas, and connecting with anyone who's just as
+          excited about life as I am. Scroll down, explore, and feel free to reach out — I'd
+          love to hear from you! 🚀
+        </p>
+        <div style="margin-top:28px">
+          <a href="#contact" class="btn btn-ghost" style="border-radius:50px">Let's connect ↗</a>
+        </div>
+      </div>
+
+      <div class="reveal">
+        <p class="hobbies-title">My Interests</p>
+        <div class="hobbies">
+          <div class="hobby-card">
+            <div class="hobby-icon cyan">🏐</div>
+            <div class="hobby-info">
+              <strong>Volleyball</strong>
+              <span>Team sport, strategy & adrenaline</span>
+            </div>
+          </div>
+          <div class="hobby-card">
+            <div class="hobby-icon purple">🤖</div>
+            <div class="hobby-info">
+              <strong>Artificial Intelligence</strong>
+              <span>Exploring how machines learn & think</span>
+            </div>
+          </div>
+          <div class="hobby-card">
+            <div class="hobby-icon pink">🎵</div>
+            <div class="hobby-info">
+              <strong>Music</strong>
+              <span>Finding the perfect soundtrack to life</span>
+            </div>
+          </div>
+          <div class="hobby-card">
+            <div class="hobby-icon gold">🔍</div>
+            <div class="hobby-info">
+              <strong>Searching New Things</strong>
+              <span>Curiosity is my superpower</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ PHOTOS ═══ -->
+<section class="section" id="photos" style="padding-top:0">
+  <div class="wrap">
+    <div class="reveal">
+      <p class="section-label">Gallery</p>
+      <h2 class="section-title">A peek into <span>my world</span></h2>
+      <div class="divider"></div>
+    </div>
+    <div class="gallery-grid reveal">
+      <!-- Add  style="background-image:url('photo.jpg')"  to each .photo you want to fill -->
+      <div class="photo big">
+        <div class="photo-overlay"><span class="photo-label">📸 Photo 1</span></div>
+        <span>Your best photo here</span>
+      </div>
+      <div class="photo">
+        <div class="photo-overlay"><span class="photo-label">📸 Photo 2</span></div>
+        <span>Photo 2</span>
+      </div>
+      <div class="photo">
+        <div class="photo-overlay"><span class="photo-label">📸 Photo 3</span></div>
+        <span>Photo 3</span>
+      </div>
+      <div class="photo">
+        <div class="photo-overlay"><span class="photo-label">📸 Photo 4</span></div>
+        <span>Photo 4</span>
+      </div>
+      <div class="photo big">
+        <div class="photo-overlay"><span class="photo-label">📸 Photo 5</span></div>
+        <span>Your favourite shot</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ CONTACT ═══ -->
+<section class="section" id="contact">
+  <div class="wrap">
+    <div class="reveal">
+      <p class="section-label">Say hello</p>
+      <h2 class="section-title">Let's <span>connect</span></h2>
+      <div class="divider"></div>
+    </div>
+    <div class="contact-wrapper">
+
+      <!-- Direct contact -->
+      <div class="contact-card reveal">
+        <p style="color:var(--muted);font-size:14px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-bottom:20px">Direct Contact</p>
+
+        <a class="contact-item" href="tel:+919035186050">
+          <div class="c-icon">📞</div>
+          <div class="c-info">
+            <strong>+91 9035186050</strong>
+            <span>Call or WhatsApp me</span>
+          </div>
+        </a>
+
+        <a class="contact-item" href="mailto:bodegnaneshwar9@gmail.com">
+          <div class="c-icon">✉️</div>
+          <div class="c-info">
+            <strong>bodegnaneshwar9@gmail.com</strong>
+            <span>Send me a message</span>
+          </div>
+        </a>
+      </div>
+
+      <!-- Social -->
+      <div class="contact-card reveal">
+        <p class="social-title">Find me on</p>
+        <div class="socials">
+          <!-- Replace href="#" with your real profile URLs -->
+          <a href="#" target="_blank" rel="noopener" class="social-btn s-instagram">
+            <span class="s-icon">📸</span>
+            Instagram
+            <span class="s-arrow">↗</span>
+          </a>
+          <a href="#" target="_blank" rel="noopener" class="social-btn s-facebook">
+            <span class="s-icon">📘</span>
+            Facebook
+            <span class="s-arrow">↗</span>
+          </a>
+          <a href="https://wa.me/919035186050" target="_blank" rel="noopener" class="social-btn s-whatsapp">
+            <span class="s-icon">💬</span>
+            WhatsApp
+            <span class="s-arrow">↗</span>
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FOOTER ═══ -->
+<footer>
+  <div class="footer-glow"></div>
+  <span class="footer-heart">💜</span>
+  <h2>Thank you for visiting!</h2>
+  <p>
+    It really means the world to me that you took the time to stop by and get to know me.
+    Hope to see you again soon — and don't be a stranger!
+  </p>
+  <a href="#contact" class="btn btn-primary">Say hello ✉️</a>
+  <p class="footer-copy">© 2025 Nani · Made with 💜 and a lot of curiosity</p>
+</footer>
+
+<!-- ═══ SCRIPTS ═══ -->
+<script>
+/* ─── Starfield ─── */
+(function(){
+  const canvas = document.getElementById("stars");
+  const ctx = canvas.getContext("2d");
+  let W, H, stars = [];
+  function resize(){
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+  function init(){
+    stars = [];
+    for(let i=0;i<180;i++){
+      stars.push({
+        x:Math.random()*W, y:Math.random()*H,
+        r:Math.random()*1.4+.2,
+        a:Math.random(),
+        speed:Math.random()*.3+.05,
+        dir:Math.random()>.5?1:-1
+      });
+    }
+  }
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    stars.forEach(s=>{
+      s.a += s.speed*.01*s.dir;
+      if(s.a>1||s.a<0) s.dir*=-1;
+      ctx.beginPath();
+      ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(180,220,255,${s.a})`;
+      ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  resize(); init(); draw();
+  window.addEventListener("resize",()=>{resize();init()});
+})();
+
+/* ─── Scroll reveal ─── */
+const observer = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){ e.target.classList.add("visible"); observer.unobserve(e.target); }
+  });
+},{threshold:.15});
+document.querySelectorAll(".reveal").forEach(el=>observer.observe(el));
+
+/* ─── Typing effect for hero h1 ─── */
+(function(){
+  const el = document.querySelector(".hero h1");
+  if(!el) return;
+  const full = el.textContent;
+  el.textContent="";
+  el.style.opacity="1";
+  let i=0;
+  function type(){
+    if(i<=full.length){el.textContent=full.slice(0,i);i++;setTimeout(type,45);}
+  }
+  setTimeout(type,400);
+})();
+</script>
+</body>
+</html>
