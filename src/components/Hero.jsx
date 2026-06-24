@@ -29,7 +29,7 @@ export default function Hero() {
       <div className="orb orb-3" />
       <div style={{ position: 'relative', zIndex: 2 }}>
         <div className="avatar-ring">
-          <div className="avatar-inner">Your<br />Photo</div>
+          <div className="avatar-inner" style={{ backgroundImage: 'url(/avatar.jpeg)', backgroundSize: 'cover', backgroundPosition: 'center' }} />
         </div>
         <div className="hero-eyebrow">
           <span className="dot-live" />
