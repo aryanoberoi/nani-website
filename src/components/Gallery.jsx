@@ -1,11 +1,11 @@
 import useReveal from './useReveal'
 
 const photos = [
-  { label: '📸 Photo 1', text: 'Your best photo here', big: true },
-  { label: '📸 Photo 2', text: 'Photo 2' },
-  { label: '📸 Photo 3', text: 'Photo 3' },
-  { label: '📸 Photo 4', text: 'Photo 4' },
-  { label: '📸 Photo 5', text: 'Your favourite shot', big: true },
+  { src: '/photos/photo1.jpeg', label: 'Gym vibes 🔥', big: true },
+  { src: '/photos/photo2.jpeg', label: 'Mirror check 💪' },
+  { src: '/photos/photo3.jpeg', label: 'Retro mode 📺' },
+  { src: '/photos/photo4.jpeg', label: 'In my bag 🎒' },
+  { src: '/photos/photo5.jpeg', label: 'Back gains 🏋️', big: true },
 ]
 
 export default function Gallery() {
@@ -22,11 +22,14 @@ export default function Gallery() {
         </div>
         <div ref={gridRef} className="gallery-grid reveal">
           {photos.map(p => (
-            <div key={p.label} className={`photo${p.big ? ' big' : ''}`}>
+            <div
+              key={p.label}
+              className={`photo${p.big ? ' big' : ''}`}
+              style={{ backgroundImage: `url(${p.src})` }}
+            >
               <div className="photo-overlay">
                 <span className="photo-label">{p.label}</span>
               </div>
-              <span>{p.text}</span>
             </div>
           ))}
         </div>
